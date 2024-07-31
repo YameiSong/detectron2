@@ -135,10 +135,22 @@ class SemSegEvaluator(DatasetEvaluator):
 
             gt[gt == self._ignore_label] = self._num_classes
 
-            self._conf_matrix += np.bincount(
-                (self._num_classes + 1) * pred.reshape(-1) + gt.reshape(-1),
-                minlength=self._conf_matrix.size,
-            ).reshape(self._conf_matrix.shape)
+            try:
+                self._conf_matrix += np.bincount(
+                    (self._num_classes + 1) * pred.reshape(-1) + gt.reshape(-1),
+                    minlength=self._conf_matrix.size,
+                ).reshape(self._conf_matrix.shape)
+            except Exception as e:
+                print("pred: ", pred)
+                print("gt: ", gt)
+                print("pred shape: ", pred.shape)
+                print("gt shape: ", gt.shape)
+                print("pred reshape: ", pred.reshape(-1))
+                print("gt reshape: ", gt.reshape(-1))
+                print("conf matrix shape: ", self._conf_matrix.shape)
+                print("conf matrix size: ", self._conf_matrix.size)
+                print("num classes: ", self._num_classes)
+                raise e
 
             if self._compute_boundary_iou:
                 b_gt = self._mask_to_boundary(gt.astype(np.uint8))
